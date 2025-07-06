@@ -1,0 +1,24 @@
+yaml
+
+---
+- name: Ensure 'developer' user exists
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check if 'developer' user exists
+      ansible.builtin.command: id developer
+      register: developer_check
+      ignore_errors: true
+
+    - name: Create 'developer' user if not exists
+      ansible.builtin.user:
+        name: developer
+      when: developer_check.rc != 0
+
+    - name: Show developer user info (if exists)
+      ansible.builtin.command: id developer
+      register: developer_id
+
+    - name: Print developer user info
+      ansible.builtin.debug:
+        var: developer_id.stdout
